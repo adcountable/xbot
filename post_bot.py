@@ -1,5 +1,6 @@
 """Posts anti-ragebait Bitcoin/finance takes to X on a schedule."""
 
+import io
 import tweepy
 import anthropic
 import random
@@ -55,21 +56,39 @@ def generate_tweet() -> str:
     return message.content[0].text.strip()
 
 
-def post_tweet(text: str):
+def post_tweet(text: str, media_id=None):
     client = tweepy.Client(
         consumer_key=X_API_KEY,
         consumer_secret=X_API_SECRET,
         access_token=X_ACCESS_TOKEN,
         access_token_secret=X_ACCESS_TOKEN_SECRET,
     )
-    response = client.create_tweet(text=text)
+    kwargs = {"text": text}
+    if media_id:
+        kwargs["media_ids"] = [media_id]
+    response = client.create_tweet(**kwargs)
     print(f"[post_bot] Posted tweet ID: {response.data['id']}")
 
 
 def run():
+    from chart_bot import fetch_btc_data, build_chart
     tweet = generate_tweet()
     print(f"[post_bot] Generated: {tweet}")
-    post_tweet(tweet)
+
+    media_id = None
+    if random.random() < 0.2:  # 20% of posts include a chart
+        try:
+            data  = fetch_btc_data(days=7)
+            img   = build_chart(data)
+            auth  = tweepy.OAuth1UserHandler(X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET)
+            api   = tweepy.API(auth)
+            media = api.media_upload(filename="btc.png", file=io.BytesIO(img))
+            media_id = media.media_id
+            print("[post_bot] Chart attached")
+        except Exception as e:
+            print(f"[post_bot] Chart failed (posting without): {e}")
+
+    post_tweet(tweet, media_id)
 
 
 if __name__ == "__main__":
