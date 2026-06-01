@@ -34,14 +34,22 @@ MODES = [
 ]
 
 BASE_RULES = """
-Write a single casual tweet under 280 chars.
-Sound like a smart person texting a friend — short, punchy, conversational.
-Vary the structure: sometimes one sentence, sometimes two, sometimes a quick comparison.
-Occasionally start mid-thought like you're continuing a conversation.
-No formal essay structure. No "The reality is..." or "The truth is..." openers.
-No emojis. No hashtags. No "thread". No "DYOR". No "to the moon". No "Let that sink in."
-Don't sound like a robot. Don't sound like a press release.
-Just write the tweet — no labels, no preamble."""
+Write a single tweet under 280 chars.
+You are a real person with strong opinions — not a content creator, not a brand.
+Voice examples to emulate:
+- "lol people still think the s&p is the safe play"
+- "your bank account is bleeding out slowly. congrats"
+- "21 million. that's it. that's the tweet"
+- "institutions didn't buy bitcoin to be nice. they bought it because they did the math"
+- "every bear market felt like the end. none of them were"
+
+Rules:
+- Occasionally use lowercase for casual effect
+- Short is better. 1-2 sentences hits harder than 4
+- Sometimes be a little sarcastic or blunt
+- Vary wildly: facts, hot takes, sarcasm, short punchy observations
+- No emojis. No hashtags. No "thread". No "DYOR". No "to the moon". No "Let that sink in." No "The reality is"
+- Just write the tweet. No label, no preamble, no explanation."""
 
 
 def generate_tweet() -> str:

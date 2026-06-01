@@ -125,13 +125,17 @@ def build_prediction_chart(history: list[dict], current_price: float) -> bytes:
 
 def generate_prediction(current_price: float) -> str:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    prompt = f"""You are an aggressively bullish Bitcoin analyst posting a daily price prediction.
+    prompt = f"""You are an aggressively bullish Bitcoin analyst posting a chart with a $1M price target.
 
 Current Bitcoin price: ${current_price:,.0f}
 
-Write a single punchy, confident tweet (under 240 chars) predicting Bitcoin's path to $1,000,000.
-Reference a specific year (2030 or earlier), a specific catalyst (halving cycles, institutional adoption, dollar debasement, sovereign adoption), and make it sound inevitable — not hopeful.
-Casual tone, not a press release. No emojis. No hashtags. Don't start with "Bitcoin"."""
+Write a SHORT caption for a monthly BTC chart showing the path to $1M (under 200 chars).
+Be blunt and confident. Reference one specific catalyst (halving, institutional, dollar collapse, supply shock).
+Sound like a trader, not a blogger. Occasionally use lowercase. No emojis. No hashtags.
+Examples of the vibe:
+- "same chart, every cycle. $1M is just the next stop."
+- "halvings don't care about your feelings. chart speaks for itself."
+- "supply shock incoming. this chart goes to $1M and everyone will pretend they knew."
 
     msg = client.messages.create(
         model="claude-sonnet-4-6",
@@ -158,17 +162,20 @@ def generate_price_call(current_price: float) -> str:
     ten_year_price = random.uniform(1_300_000, 5_000_000)
 
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    prompt = f"""You are an aggressively bullish Bitcoin trader posting a daily price call.
+    prompt = f"""You are a blunt, unapologetically bullish Bitcoin trader.
 
-Facts to use:
+Post a daily price call with these exact numbers:
 - Today: ${current_price:,.0f}
-- 1 year target: ${next_year_price:,.0f} (use this exact number)
-- 10 year target: ${ten_year_price:,.0f} (use this exact number)
+- 1 year: ${next_year_price:,.0f}
+- 10 years: ${ten_year_price:,.0f}
 
-Write a casual, spicy tweet (under 260 chars) with these 3 price points.
-Format it naturally — like someone who's totally confident posting their take.
-Be direct and punchy. Vary the format each time — sometimes use line breaks, sometimes run-on.
-No emojis. No hashtags. Don't hedge. Don't say "I think" or "could be"."""
+Make it feel like a real trader's hot take — short, direct, a little cocky.
+Vary the format: sometimes 3 lines, sometimes one run-on sentence, sometimes punchy fragments.
+No hedging. No "I think". No emojis. No hashtags.
+Examples of the vibe:
+- "btc today: $67k. this time next year: $180k. 2035: $2.4M. screenshot this."
+- "today $67,000. year from now $190,000. decade from now $1.8M. save this tweet."
+- "$67k now. $200k by end of next year. $3M by 2034. not a prediction, just math." """
 
     msg = client.messages.create(
         model="claude-sonnet-4-6",
