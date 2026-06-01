@@ -1,0 +1,18 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+X_API_KEY             = os.environ["X_API_KEY"]
+X_API_SECRET          = os.environ["X_API_SECRET"]
+X_ACCESS_TOKEN        = os.environ["X_ACCESS_TOKEN"]
+X_ACCESS_TOKEN_SECRET = os.environ["X_ACCESS_TOKEN_SECRET"]
+
+ANTHROPIC_API_KEY     = os.environ["ANTHROPIC_API_KEY"]
+
+EMAIL_FROM            = os.environ["EMAIL_FROM"]       # your Gmail address
+EMAIL_APP_PASSWORD    = os.environ["EMAIL_APP_PASSWORD"]
+PHONE_NUMBER          = os.environ["PHONE_NUMBER"]     # 10 digits, no dashes e.g. 2125551234
+
+POST_TIMES            = os.getenv("POST_TIMES", "08:00,13:00,19:00").split(",")
+DIGEST_TIME           = os.getenv("DIGEST_TIME", "07:00")
