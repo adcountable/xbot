@@ -8,6 +8,9 @@ on:
     # Daily BTC chart — 9am ET (14:00 UTC)
     - cron: '0 14 * * *'
 
+    # Daily $1M prediction — 11am ET (16:00 UTC)
+    - cron: '0 16 * * *'
+
     # Replies — 3x/day
     - cron: '0 15 * * *'   # 10am ET
     - cron: '0 19 * * *'   # 2pm ET
@@ -33,6 +36,23 @@ on:
   workflow_dispatch:         # manual trigger from GitHub UI
 
 jobs:
+  prediction:
+    if: github.event.schedule == '0 16 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python prediction_bot.py
+        env:
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          X_API_KEY:              ${{ secrets.X_API_KEY }}
+          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+
   reply:
     if: >
       github.event.schedule == '0 15 * * *' ||
