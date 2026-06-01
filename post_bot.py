@@ -54,6 +54,20 @@ Rules:
 
 def generate_tweet() -> str:
     mode_name, mode_instruction = random.choice(MODES)
+
+    # 50% of posts are sentiment-informed
+    if random.random() < 0.5:
+        try:
+            from sentiment import fetch_recent_btc_tweets, analyze_sentiment, get_sentiment_informed_tweet
+            tweets = fetch_recent_btc_tweets(total=40)
+            if tweets:
+                sentiment_data = analyze_sentiment(tweets)
+                print(f"[post_bot] Sentiment: {sentiment_data['sentiment']} | narratives: {sentiment_data['top_narratives']}")
+                return get_sentiment_informed_tweet(sentiment_data, mode_instruction, BASE_RULES)
+        except Exception as e:
+            print(f"[post_bot] Sentiment fetch failed, posting without: {e}")
+
+    # Fallback: standard tweet
     prompt = f"You are a sharp, bullish Bitcoin commentator.\n\nYour task: {mode_instruction}\n{BASE_RULES}"
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     message = client.messages.create(
