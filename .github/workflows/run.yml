@@ -11,10 +11,8 @@ on:
     # Daily $1M prediction — 11am ET (16:00 UTC)
     - cron: '0 16 * * *'
 
-    # Replies — 3x/day
-    - cron: '0 15 * * *'   # 10am ET
-    - cron: '0 19 * * *'   # 2pm ET
-    - cron: '0 23 * * *'   # 6pm ET
+    # Replies — every 30 minutes
+    - cron: '*/30 * * * *'
 
     # Night posts
     - cron: '0 2 * * *'    # 9pm ET — retirement calculator
@@ -92,11 +90,7 @@ jobs:
           X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
 
   reply:
-    if: >
-      github.event.schedule == '0 15 * * *' ||
-      github.event.schedule == '0 19 * * *' ||
-      github.event.schedule == '0 23 * * *' ||
-      github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '*/30 * * * *' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
