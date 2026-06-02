@@ -3,10 +3,10 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-X_API_KEY             = os.environ["X_API_KEY"]
-X_API_SECRET          = os.environ["X_API_SECRET"]
-X_ACCESS_TOKEN        = os.environ["X_ACCESS_TOKEN"]
-X_ACCESS_TOKEN_SECRET = os.environ["X_ACCESS_TOKEN_SECRET"]
+X_API_KEY             = os.getenv("X_API_KEY", "")
+X_API_SECRET          = os.getenv("X_API_SECRET", "")
+X_ACCESS_TOKEN        = os.getenv("X_ACCESS_TOKEN", "")
+X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET", "")
 
 ANTHROPIC_API_KEY     = os.environ["ANTHROPIC_API_KEY"]
 
