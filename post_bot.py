@@ -30,7 +30,7 @@ MODES = [
     ("FINANCIAL FREEDOM — inflation", "Write about Bitcoin as protection from inflation and monetary debasement. The dollar has lost 97% of its purchasing power since 1913. Bitcoin's supply is fixed at 21 million forever. One of these was designed for you. The other wasn't."),
     ("FINANCIAL FREEDOM — sovereignty", "Write about Bitcoin as financial sovereignty. For the first time in history, you can be your own bank. No intermediary can freeze your funds, confiscate your savings, or devalue your wealth through money printing."),
     ("FINANCIAL FREEDOM — unbanked", "Write about Bitcoin empowering the unbanked. 1.4 billion people have no access to banking. Bitcoin requires only a phone and internet. No credit check, no minimum balance, no government approval. This is what financial inclusion actually looks like."),
-    ("FINANCIAL FREEDOM — censorship", "Write about Bitcoin's censorship resistance. Governments freeze bank accounts of protesters (Canada 2022). PayPal deplatforms people for wrong opinions. Bitcoin transactions cannot be stopped, reversed, or censored by anyone."),
+    ("FINANCIAL FREEDOM — censorship", "Write about Bitcoin's censorship resistance. Governments and payment processors freeze accounts, deplatform people, and cut off financial access for political reasons. Bitcoin transactions cannot be stopped, reversed, or censored by anyone — no bank, no government, no corporation. Use different real-world examples each time: PayPal deplatforming, sanctions, asset seizures, banking the unbanked, wire transfer holds."),
 ]
 
 BASE_RULES = """
