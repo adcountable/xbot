@@ -99,7 +99,7 @@ def run():
     print(f"[post_bot] Generated: {tweet}")
 
     media_id = None
-    if random.random() < 0.2:  # 20% of posts include a chart
+    if random.random() < 0.8:  # 80% of posts include a chart
         try:
             data  = fetch_btc_data(days=7)
             img   = build_chart(data)
