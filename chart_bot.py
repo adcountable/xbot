@@ -53,7 +53,7 @@ def build_chart(data: dict) -> bytes:
         figcolor="#0d1117",
         gridcolor="#1a1a2e",
         gridstyle="--",
-        gridaxis="y",
+        gridaxis="horizontal",
         y_on_right=True,
         rc={"axes.labelcolor": "#888", "xtick.color": "#888", "ytick.color": "#888"},
     )
