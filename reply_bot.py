@@ -6,15 +6,27 @@ import random
 from config import X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET, ANTHROPIC_API_KEY
 
 SEARCH_QUERIES = [
+    # Bitcoin specific
     "#Bitcoin -is:retweet lang:en",
     "$BTC -is:retweet lang:en",
     "bitcoin price -is:retweet lang:en",
     "bitcoin dead -is:retweet lang:en",
     "bitcoin bubble -is:retweet lang:en",
-    "bitcoin energy -is:retweet lang:en",
     "bitcoin too late -is:retweet lang:en",
     "sell bitcoin -is:retweet lang:en",
     "crypto crash -is:retweet lang:en",
+    # Lifestyle / retirement finance — high engagement, ripe for Bitcoin angle
+    "quit the 9-5 -is:retweet lang:en",
+    "enough to retire -is:retweet lang:en",
+    "financial freedom -is:retweet lang:en",
+    "passive income -is:retweet lang:en",
+    "retire early -is:retweet lang:en",
+    "stock market -is:retweet lang:en",
+    "invested right -is:retweet lang:en",
+    "beat inflation -is:retweet lang:en",
+    "savings account -is:retweet lang:en",
+    "real estate investment -is:retweet lang:en",
+    "index funds -is:retweet lang:en",
 ]
 
 REPLY_RULES = """
