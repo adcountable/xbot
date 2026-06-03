@@ -60,7 +60,7 @@ Numbers (using 4% withdrawal rule, 25x annual):
 Write a punchy tweet (under 260 chars) with these exact numbers.
 Make the point that the window to accumulate is closing.
 Casual, a bit provocative. Vary the format — sometimes direct numbers, sometimes storytelling.
-No emojis. No hashtags. Don't start with "Bitcoin".
+No emojis. No hashtags. No em dashes (the — character). Don't start with "Bitcoin".
 Examples of the vibe:
 - "to retire in bali on $60k/year you need 22 BTC today. at $1M bitcoin? 1.5 BTC. the math rewards early action."
 - "comfortable retirement in miami = $3M. at today's price that's 44 BTC. at $1M bitcoin it's 3 BTC. same destination, very different ticket price." """
@@ -99,7 +99,7 @@ Dominant emotion: {sentiment['dominant_emotion']}
 Write a nightly sentiment post + bold prediction for tomorrow (under 260 chars).
 Be confident and specific — give an actual directional call.
 Casual tone, sounds like a real trader signing off for the night.
-No emojis. No hashtags.
+No emojis. No hashtags. No em dashes (the — character).
 Examples:
 - "market's in full panic mode tonight. fear this high usually means one thing. watching for reversal at open."
 - "everyone's greedy right now. historically that's when you tighten up. tomorrow will be interesting."

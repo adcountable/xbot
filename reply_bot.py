@@ -58,7 +58,8 @@ Rules:
 - Challenge the assumption, expose the flaw, or add the missing context they ignored.
 - Occasionally use lowercase for casual effect.
 - No emojis. No hashtags. No "actually". No "well technically".
-Just write the reply — nothing else."""
+- No em dashes (the — character). Use a comma or period instead.
+Just write the reply. Nothing else."""
 
 
 def get_client():

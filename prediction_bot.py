@@ -136,6 +136,7 @@ Examples of the vibe:
 - "same chart, every cycle. $1M is just the next stop."
 - "halvings don't care about your feelings. chart speaks for itself."
 - "supply shock incoming. this chart goes to $1M and everyone will pretend they knew."
+No em dashes (the — character). No emojis. No hashtags."""
 
     msg = client.messages.create(
         model="claude-sonnet-4-6",
@@ -175,7 +176,8 @@ No hedging. No "I think". No emojis. No hashtags.
 Examples of the vibe:
 - "btc today: $67k. this time next year: $180k. 2035: $2.4M. screenshot this."
 - "today $67,000. year from now $190,000. decade from now $1.8M. save this tweet."
-- "$67k now. $200k by end of next year. $3M by 2034. not a prediction, just math." """
+- "$67k now. $200k by end of next year. $3M by 2034. not a prediction, just math."
+No em dashes (the — character). No emojis. No hashtags."""
 
     msg = client.messages.create(
         model="claude-sonnet-4-6",

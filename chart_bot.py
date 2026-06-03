@@ -102,8 +102,8 @@ Data:
 - 30d performance: {change30:+.1f}%
 
 Write a short, spicy chart caption (under 200 chars).
-Sound like a real trader — blunt, confident, specific about what the chart is showing.
-Occasionally lowercase. No emojis. No hashtags. Don't start with "Bitcoin"."""
+Sound like a real trader, blunt, confident, specific about what the chart is showing.
+Occasionally lowercase. No emojis. No hashtags. No em dashes (the — character). Don't start with "Bitcoin"."""
 
     msg = client.messages.create(
         model="claude-sonnet-4-6",

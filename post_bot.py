@@ -35,13 +35,13 @@ MODES = [
 ]
 
 AFFORDABILITY_MODES = [
-    ("AFFORDABILITY — housing", "Write a sharp take on the housing affordability crisis. Median home prices are 7x median income — the worst ratio in US history. A generation locked out of ownership not because they're broke but because money was printed and parked in real estate. Be blunt. No fluff."),
-    ("AFFORDABILITY — k-shaped economy", "Write about the k-shaped economy — where the top 20% recovered and then some after 2020 while the bottom 80% got left behind. Asset prices went up. Wages didn't keep pace. Be specific: S&P doubled, rent up 30%, grocery bills up 25%, wages up 15%. The math doesn't work for most people."),
-    ("AFFORDABILITY — retirement", "Write about the retirement crisis. 56% of Americans have less than $10k saved for retirement. Social Security is projected to cut benefits by 2033. The 401k was never designed to replace a pension — it was a tax loophole that became the whole plan. Be honest about what that means for the average person."),
-    ("AFFORDABILITY — wages vs cost of living", "Write a take on wages vs. cost of living. CPI has risen 30%+ since 2020. Median wages are up ~20%. The gap is real and compounding. Groceries, rent, insurance, childcare — all running ahead of paychecks. The middle class isn't complaining — they're doing math."),
-    ("AFFORDABILITY — student debt", "Write about the student debt trap. $1.7 trillion in student loans. Average grad owes $37k. College costs have risen 4x faster than inflation since 1985. They were sold a credential, not a career. The system extracted 4 years of tuition and gave back a degree in a buyer's market."),
-    ("AFFORDABILITY — cost of everything", "Write a punchy take about how everything costs more and nobody in charge seems bothered. Insurance premiums. Eggs. Rent. Car payments. Childcare. Prescription drugs. Not a supply chain problem anymore — it's a 'we printed $6 trillion and acted surprised' problem."),
-    ("AFFORDABILITY — wealth gap", "Write about the widening wealth gap. The top 1% owns more wealth than the entire middle class combined. In 1980 the ratio of CEO-to-worker pay was 30:1. Today it's 350:1. Be specific, be blunt, don't sugarcoat it."),
+    ("AFFORDABILITY — housing vs stocks", "Write an angry, blunt tweet about this specific contradiction: the S&P 500 is at all-time highs, corporate profits are record-breaking, and yet 80% of Americans cannot afford the median home. Home prices are up 50%+ since 2020. This isn't a market. It's a trap. Be genuinely pissed. Short sentences. No softening."),
+    ("AFFORDABILITY — food prices", "Write an angry tweet about the cost of real food. Beef prices are up over 100% in the last decade. Organic produce, quality protein, actual nutrition: all priced out of reach for the average family. Meanwhile the stock market celebrates. Be specific and furious. The people who made this happen are doing fine."),
+    ("AFFORDABILITY — k-shaped economy", "Write an angry tweet about the k-shaped recovery. After 2020: S&P doubled, billionaire wealth up $1.3 trillion, stock buybacks hit records. Also after 2020: rent up 30%, groceries up 25%, wages up 15%, housing up 50%. The K tells you exactly who this system was built for. Be direct and pissed off."),
+    ("AFFORDABILITY — retirement scam", "Write an angry tweet about the retirement crisis. 56% of Americans have less than $10k saved. Social Security gets cut by 2033. The 401k was a tax trick that became the entire plan. Pensions: gone. The people who designed this system retired with full benefits. Be genuinely angry about that."),
+    ("AFFORDABILITY — wages vs everything", "Write an angry tweet about wages vs. cost of living. CPI up 30%+ since 2020. Rent up 30%. Car insurance up 40%. Groceries up 25%. Wages up 18%. Every year the gap compounds. The math doesn't work and everyone in charge pretends not to notice. Be blunt and pissed off. Short punchy sentences."),
+    ("AFFORDABILITY — wealth gap rage", "Write an angry tweet about the wealth gap. The top 1% now owns more than the entire bottom 90% combined. CEO-to-worker pay ratio: 350:1. In 1980 it was 30:1. Stock market at all-time highs means nothing to the 60% of Americans who own less than $10k in stocks. Say this directly and with anger."),
+    ("AFFORDABILITY — student debt trap", "Write an angry tweet about the student debt trap. $1.7 trillion in loans. Average grad owes $37k. College costs rose 4x faster than inflation since 1985. They were sold a credential, handed a bill, and graduated into a job market that didn't care. The people running universities retired rich. Be furious."),
 ]
 
 BASE_RULES = """
@@ -62,6 +62,7 @@ Rules:
 - Sometimes be a little sarcastic or blunt
 - Vary wildly: facts, hot takes, sarcasm, short punchy observations
 - No emojis. No hashtags. No "thread". No "DYOR". No "to the moon". No "Let that sink in." No "The reality is"
+- No em dashes (the — character). Use a comma or period instead.
 - NEVER mention Canada, Canadian truckers, or the freedom convoy
 - Just write the tweet. No label, no preamble, no explanation."""
 
