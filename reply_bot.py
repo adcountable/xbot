@@ -1,4 +1,4 @@
-"""Finds high-engagement Bitcoin tweets and replies with sharp takes."""
+"""Finds high-engagement tweets and replies with sharp contrarian takes."""
 
 import tweepy
 import anthropic
@@ -19,29 +19,27 @@ SEARCH_QUERIES = [
     "bitcoin too late -is:retweet lang:en",
     "sell bitcoin -is:retweet lang:en",
     "crypto crash -is:retweet lang:en",
-    # Lifestyle / retirement finance — high engagement, ripe for Bitcoin angle
+    # Lifestyle / retirement finance
     "quit the 9-5 -is:retweet lang:en",
     "enough to retire -is:retweet lang:en",
     "financial freedom -is:retweet lang:en",
     "passive income -is:retweet lang:en",
     "retire early -is:retweet lang:en",
     "stock market -is:retweet lang:en",
-    "invested right -is:retweet lang:en",
     "beat inflation -is:retweet lang:en",
     "savings account -is:retweet lang:en",
-    "real estate investment -is:retweet lang:en",
     "index funds -is:retweet lang:en",
+    "real estate investment -is:retweet lang:en",
     # Affordability / cost of living
     "can't afford a house -is:retweet lang:en",
     "cost of living -is:retweet lang:en",
     "housing prices -is:retweet lang:en",
-    "middle class -is:retweet lang:en",
-    "inflation is killing -is:retweet lang:en",
-    "k shaped economy -is:retweet lang:en",
+    "middle class squeeze -is:retweet lang:en",
+    "inflation is killing me -is:retweet lang:en",
 ]
 
 REPLY_RULES = """
-You are a sharp, contrarian Bitcoin commentator replying to a tweet.
+You are a sharp, contrarian commentator on finance, Bitcoin, and the economy.
 Your style: short, dry, a little sarcastic — you challenge the premise without being a jerk.
 Think: smart guy at the bar who's heard this take before and has a one-liner ready.
 
@@ -50,8 +48,9 @@ Examples of the vibe:
 - Tweet: "Bitcoin is too volatile to be a store of value" → Reply: "so is your salary after inflation. at least one of them goes up."
 - Tweet: "I'm waiting for Bitcoin to drop before I buy" → Reply: "you said that at $10k too"
 - Tweet: "stocks are safer than crypto" → Reply: "tell that to anyone who held Enron, Lehman, or Bed Bath & Beyond"
-- Tweet: "I can't afford a house" → Reply: "real estate is the one asset that gets praised for being out of reach"
+- Tweet: "I can't afford a house" → Reply: "real estate is the one asset that gets praised specifically for being out of reach"
 - Tweet: "cost of living is up again" → Reply: "the printer didn't print this problem away. shocking."
+- Tweet: "just put everything in index funds" → Reply: "great plan. hope the Fed printer stays on."
 
 Rules:
 - 1-2 sentences MAX. Shorter is almost always better.
@@ -75,33 +74,51 @@ def get_client():
 
 
 def find_tweet_to_reply():
-    """Find a recent high-engagement tweet to reply to."""
+    """Try multiple queries until we find a replyable tweet."""
     client = get_client()
-    query = random.choice(SEARCH_QUERIES)
-    print(f"[reply_bot] Query: {query}")
 
-    results = client.search_recent_tweets(
-        query=query,
-        max_results=10,
-        tweet_fields=["public_metrics", "author_id", "text"],
-        expansions=["author_id"],
-    )
+    # Shuffle queries and try up to 6 before giving up
+    queries = random.sample(SEARCH_QUERIES, min(6, len(SEARCH_QUERIES)))
 
-    if not results.data:
-        print(f"[reply_bot] No results for query: {query}")
-        return None
+    for query in queries:
+        print(f"[reply_bot] Trying query: {query}")
+        try:
+            results = client.search_recent_tweets(
+                query=query,
+                max_results=10,
+                tweet_fields=["public_metrics", "author_id", "text", "reply_settings"],
+                expansions=["author_id"],
+            )
+        except Exception as e:
+            print(f"[reply_bot] Search error on '{query}': {e}")
+            continue
 
-    print(f"[reply_bot] Got {len(results.data)} results")
+        if not results.data:
+            print(f"[reply_bot] No results — trying next query")
+            continue
 
-    # Pick tweet with most engagement (gracefully handle missing metrics)
-    def engagement(t):
-        m = t.public_metrics or {}
-        return m.get("like_count", 0) + m.get("retweet_count", 0) * 2
+        # Filter out tweets with restricted replies
+        open_tweets = [
+            t for t in results.data
+            if getattr(t, "reply_settings", "everyone") in ("everyone", None, "")
+        ]
 
-    tweets = sorted(results.data, key=engagement, reverse=True)
-    top = tweets[0]
-    print(f"[reply_bot] Top tweet ({engagement(top)} engagement): {top.text[:100]}")
-    return top
+        if not open_tweets:
+            print(f"[reply_bot] All tweets are reply-restricted — trying next query")
+            continue
+
+        print(f"[reply_bot] {len(open_tweets)} open tweets found")
+
+        def engagement(t):
+            m = t.public_metrics or {}
+            return m.get("like_count", 0) + m.get("retweet_count", 0) * 2
+
+        top = sorted(open_tweets, key=engagement, reverse=True)[0]
+        print(f"[reply_bot] Selected (engagement={engagement(top)}): {top.text[:100]}")
+        return top
+
+    print("[reply_bot] Exhausted all queries — no suitable tweet found")
+    return None
 
 
 def generate_reply(tweet_text: str) -> str:
@@ -116,23 +133,22 @@ def generate_reply(tweet_text: str) -> str:
 
 
 def run():
-    print("[reply_bot] Searching for tweet to reply to...")
+    print("[reply_bot] Starting...")
 
     try:
         tweet = find_tweet_to_reply()
     except Exception as e:
-        print(f"[reply_bot] Search failed: {e}")
+        print(f"[reply_bot] Search crashed: {e}")
         traceback.print_exc()
         return
 
     if not tweet:
-        print("[reply_bot] No suitable tweet found — skipping")
         return
 
     try:
         reply = generate_reply(tweet.text)
     except Exception as e:
-        print(f"[reply_bot] Reply generation failed: {e}")
+        print(f"[reply_bot] Claude failed: {e}")
         traceback.print_exc()
         return
 
@@ -144,9 +160,9 @@ def run():
             text=reply,
             reply={"in_reply_to_tweet_id": tweet.id}
         )
-        print(f"[reply_bot] Posted reply ID: {response.data['id']}")
+        print(f"[reply_bot] ✓ Posted reply ID: {response.data['id']}")
     except Exception as e:
-        print(f"[reply_bot] Failed to post reply: {e}")
+        print(f"[reply_bot] Post failed: {e}")
         traceback.print_exc()
 
 
