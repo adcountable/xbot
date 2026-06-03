@@ -3,7 +3,11 @@
 import tweepy
 import anthropic
 import random
-from config import X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET, ANTHROPIC_API_KEY
+import traceback
+from config import (
+    X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET,
+    ANTHROPIC_API_KEY, X_BEARER_TOKEN,
+)
 
 SEARCH_QUERIES = [
     # Bitcoin specific
@@ -27,6 +31,13 @@ SEARCH_QUERIES = [
     "savings account -is:retweet lang:en",
     "real estate investment -is:retweet lang:en",
     "index funds -is:retweet lang:en",
+    # Affordability / cost of living
+    "can't afford a house -is:retweet lang:en",
+    "cost of living -is:retweet lang:en",
+    "housing prices -is:retweet lang:en",
+    "middle class -is:retweet lang:en",
+    "inflation is killing -is:retweet lang:en",
+    "k shaped economy -is:retweet lang:en",
 ]
 
 REPLY_RULES = """
@@ -39,6 +50,8 @@ Examples of the vibe:
 - Tweet: "Bitcoin is too volatile to be a store of value" → Reply: "so is your salary after inflation. at least one of them goes up."
 - Tweet: "I'm waiting for Bitcoin to drop before I buy" → Reply: "you said that at $10k too"
 - Tweet: "stocks are safer than crypto" → Reply: "tell that to anyone who held Enron, Lehman, or Bed Bath & Beyond"
+- Tweet: "I can't afford a house" → Reply: "real estate is the one asset that gets praised for being out of reach"
+- Tweet: "cost of living is up again" → Reply: "the printer didn't print this problem away. shocking."
 
 Rules:
 - 1-2 sentences MAX. Shorter is almost always better.
@@ -50,18 +63,22 @@ Just write the reply — nothing else."""
 
 
 def get_client():
-    return tweepy.Client(
+    kwargs = dict(
         consumer_key=X_API_KEY,
         consumer_secret=X_API_SECRET,
         access_token=X_ACCESS_TOKEN,
         access_token_secret=X_ACCESS_TOKEN_SECRET,
     )
+    if X_BEARER_TOKEN:
+        kwargs["bearer_token"] = X_BEARER_TOKEN
+    return tweepy.Client(**kwargs)
 
 
 def find_tweet_to_reply():
-    """Find a recent high-engagement Bitcoin tweet to reply to."""
+    """Find a recent high-engagement tweet to reply to."""
     client = get_client()
     query = random.choice(SEARCH_QUERIES)
+    print(f"[reply_bot] Query: {query}")
 
     results = client.search_recent_tweets(
         query=query,
@@ -71,18 +88,20 @@ def find_tweet_to_reply():
     )
 
     if not results.data:
+        print(f"[reply_bot] No results for query: {query}")
         return None
 
-    # Pick tweet with most engagement
-    tweets = sorted(
-        results.data,
-        key=lambda t: (
-            t.public_metrics["like_count"] +
-            t.public_metrics["retweet_count"] * 2
-        ),
-        reverse=True,
-    )
-    return tweets[0]
+    print(f"[reply_bot] Got {len(results.data)} results")
+
+    # Pick tweet with most engagement (gracefully handle missing metrics)
+    def engagement(t):
+        m = t.public_metrics or {}
+        return m.get("like_count", 0) + m.get("retweet_count", 0) * 2
+
+    tweets = sorted(results.data, key=engagement, reverse=True)
+    top = tweets[0]
+    print(f"[reply_bot] Top tweet ({engagement(top)} engagement): {top.text[:100]}")
+    return top
 
 
 def generate_reply(tweet_text: str) -> str:
@@ -98,21 +117,37 @@ def generate_reply(tweet_text: str) -> str:
 
 def run():
     print("[reply_bot] Searching for tweet to reply to...")
-    tweet = find_tweet_to_reply()
-    if not tweet:
-        print("[reply_bot] No suitable tweet found")
+
+    try:
+        tweet = find_tweet_to_reply()
+    except Exception as e:
+        print(f"[reply_bot] Search failed: {e}")
+        traceback.print_exc()
         return
 
-    print(f"[reply_bot] Found: {tweet.text[:80]}...")
-    reply = generate_reply(tweet.text)
+    if not tweet:
+        print("[reply_bot] No suitable tweet found — skipping")
+        return
+
+    try:
+        reply = generate_reply(tweet.text)
+    except Exception as e:
+        print(f"[reply_bot] Reply generation failed: {e}")
+        traceback.print_exc()
+        return
+
     print(f"[reply_bot] Reply: {reply}")
 
-    client = get_client()
-    response = client.create_tweet(
-        text=reply,
-        reply={"in_reply_to_tweet_id": tweet.id}
-    )
-    print(f"[reply_bot] Posted reply ID: {response.data['id']}")
+    try:
+        client = get_client()
+        response = client.create_tweet(
+            text=reply,
+            reply={"in_reply_to_tweet_id": tweet.id}
+        )
+        print(f"[reply_bot] Posted reply ID: {response.data['id']}")
+    except Exception as e:
+        print(f"[reply_bot] Failed to post reply: {e}")
+        traceback.print_exc()
 
 
 if __name__ == "__main__":

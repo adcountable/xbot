@@ -15,22 +15,24 @@ on:
     - cron: '0 2 * * *'    # 9pm ET — retirement calculator
     - cron: '30 3 * * *'   # 10:30pm ET — sentiment prediction
 
-    # X posts — every 98 minutes (15x/day)
+    # Standard X posts — 10x/day (every ~2.5 hours)
     - cron: '0 0 * * *'
     - cron: '38 1 * * *'
     - cron: '16 3 * * *'
-    - cron: '54 4 * * *'
     - cron: '32 6 * * *'
-    - cron: '10 8 * * *'
     - cron: '48 9 * * *'
-    - cron: '26 11 * * *'
     - cron: '4 13 * * *'
-    - cron: '42 14 * * *'
     - cron: '20 16 * * *'
-    - cron: '58 17 * * *'
     - cron: '36 19 * * *'
     - cron: '14 21 * * *'
     - cron: '52 22 * * *'
+
+    # Affordability posts — 5x/day
+    - cron: '54 4 * * *'
+    - cron: '10 8 * * *'
+    - cron: '26 11 * * *'
+    - cron: '42 14 * * *'
+    - cron: '58 17 * * *'
 
   workflow_dispatch:
 
@@ -121,7 +123,7 @@ jobs:
 
   post:
     if: >
-      contains(fromJSON('["0 0 * * *","38 1 * * *","16 3 * * *","54 4 * * *","32 6 * * *","10 8 * * *","48 9 * * *","26 11 * * *","4 13 * * *","42 14 * * *","20 16 * * *","58 17 * * *","36 19 * * *","14 21 * * *","52 22 * * *"]'), github.event.schedule) ||
+      contains(fromJSON('["0 0 * * *","38 1 * * *","16 3 * * *","32 6 * * *","48 9 * * *","4 13 * * *","20 16 * * *","36 19 * * *","14 21 * * *","52 22 * * *"]'), github.event.schedule) ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -131,6 +133,25 @@ jobs:
           python-version: '3.11'
       - run: pip install -r requirements.txt
       - run: python post_bot.py
+        env:
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          X_API_KEY:              ${{ secrets.X_API_KEY }}
+          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+
+  post-affordability:
+    if: >
+      contains(fromJSON('["54 4 * * *","10 8 * * *","26 11 * * *","42 14 * * *","58 17 * * *"]'), github.event.schedule) ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python post_bot.py --affordability
         env:
           ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
           X_API_KEY:              ${{ secrets.X_API_KEY }}

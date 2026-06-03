@@ -1,6 +1,7 @@
 """Posts anti-ragebait Bitcoin/finance takes to X on a schedule."""
 
 import io
+import sys
 import tweepy
 import anthropic
 import random
@@ -33,6 +34,16 @@ MODES = [
     ("FINANCIAL FREEDOM — censorship", "Write about Bitcoin's censorship resistance. Governments and payment processors freeze accounts, deplatform people, and cut off financial access for political reasons. Bitcoin transactions cannot be stopped, reversed, or censored by anyone — no bank, no government, no corporation. Use different real-world examples each time: PayPal deplatforming, sanctions, asset seizures, banking the unbanked, wire transfer holds."),
 ]
 
+AFFORDABILITY_MODES = [
+    ("AFFORDABILITY — housing", "Write a sharp take on the housing affordability crisis. Median home prices are 7x median income — the worst ratio in US history. A generation locked out of ownership not because they're broke but because money was printed and parked in real estate. Be blunt. No fluff."),
+    ("AFFORDABILITY — k-shaped economy", "Write about the k-shaped economy — where the top 20% recovered and then some after 2020 while the bottom 80% got left behind. Asset prices went up. Wages didn't keep pace. Be specific: S&P doubled, rent up 30%, grocery bills up 25%, wages up 15%. The math doesn't work for most people."),
+    ("AFFORDABILITY — retirement", "Write about the retirement crisis. 56% of Americans have less than $10k saved for retirement. Social Security is projected to cut benefits by 2033. The 401k was never designed to replace a pension — it was a tax loophole that became the whole plan. Be honest about what that means for the average person."),
+    ("AFFORDABILITY — wages vs cost of living", "Write a take on wages vs. cost of living. CPI has risen 30%+ since 2020. Median wages are up ~20%. The gap is real and compounding. Groceries, rent, insurance, childcare — all running ahead of paychecks. The middle class isn't complaining — they're doing math."),
+    ("AFFORDABILITY — student debt", "Write about the student debt trap. $1.7 trillion in student loans. Average grad owes $37k. College costs have risen 4x faster than inflation since 1985. They were sold a credential, not a career. The system extracted 4 years of tuition and gave back a degree in a buyer's market."),
+    ("AFFORDABILITY — cost of everything", "Write a punchy take about how everything costs more and nobody in charge seems bothered. Insurance premiums. Eggs. Rent. Car payments. Childcare. Prescription drugs. Not a supply chain problem anymore — it's a 'we printed $6 trillion and acted surprised' problem."),
+    ("AFFORDABILITY — wealth gap", "Write about the widening wealth gap. The top 1% owns more wealth than the entire middle class combined. In 1980 the ratio of CEO-to-worker pay was 30:1. Today it's 350:1. Be specific, be blunt, don't sugarcoat it."),
+]
+
 BASE_RULES = """
 Write a single tweet under 280 chars.
 You are a real person with strong opinions — not a content creator, not a brand.
@@ -42,6 +53,8 @@ Voice examples to emulate:
 - "21 million. that's it. that's the tweet"
 - "institutions didn't buy bitcoin to be nice. they bought it because they did the math"
 - "every bear market felt like the end. none of them were"
+- "median home price is 7x median income. but sure, skip the avocado toast."
+- "they told you to work hard and save. they didn't mention the savings rate would be 0.5% while inflation ran at 4%."
 
 Rules:
 - Occasionally use lowercase for casual effect
@@ -53,11 +66,13 @@ Rules:
 - Just write the tweet. No label, no preamble, no explanation."""
 
 
-def generate_tweet() -> str:
-    mode_name, mode_instruction = random.choice(MODES)
+def generate_tweet(affordability: bool = False) -> str:
+    pool = AFFORDABILITY_MODES if affordability else MODES
+    mode_name, mode_instruction = random.choice(pool)
+    print(f"[post_bot] Mode: {mode_name}")
 
-    # 50% of posts are sentiment-informed
-    if random.random() < 0.5:
+    # 50% of standard posts are sentiment-informed (skip for affordability)
+    if not affordability and random.random() < 0.5:
         try:
             from sentiment import fetch_recent_btc_tweets, analyze_sentiment, get_sentiment_informed_tweet
             tweets = fetch_recent_btc_tweets(total=40)
@@ -68,8 +83,8 @@ def generate_tweet() -> str:
         except Exception as e:
             print(f"[post_bot] Sentiment fetch failed, posting without: {e}")
 
-    # Fallback: standard tweet
-    prompt = f"You are a sharp, bullish Bitcoin commentator.\n\nYour task: {mode_instruction}\n{BASE_RULES}"
+    # Standard tweet
+    prompt = f"You are a sharp commentator on finance, economics, and Bitcoin.\n\nYour task: {mode_instruction}\n{BASE_RULES}"
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     message = client.messages.create(
         model="claude-sonnet-4-6",
@@ -93,13 +108,15 @@ def post_tweet(text: str, media_id=None):
     print(f"[post_bot] Posted tweet ID: {response.data['id']}")
 
 
-def run():
+def run(affordability: bool = False):
     from chart_bot import fetch_btc_data, build_chart
-    tweet = generate_tweet()
+    tweet = generate_tweet(affordability=affordability)
     print(f"[post_bot] Generated: {tweet}")
 
     media_id = None
-    if random.random() < 0.8:  # 80% of posts include a chart
+    # Affordability posts: 40% chance of chart. Standard posts: 80%.
+    chart_chance = 0.4 if affordability else 0.8
+    if random.random() < chart_chance:
         try:
             data  = fetch_btc_data(days=7)
             img   = build_chart(data)
@@ -115,4 +132,5 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    affordability = "--affordability" in sys.argv or "affordability" in sys.argv
+    run(affordability=affordability)
