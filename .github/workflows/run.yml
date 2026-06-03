@@ -2,7 +2,7 @@ name: xbot
 
 on:
   schedule:
-    # Daily SMS digest — 7am ET (UTC-5 = 12:00 UTC)
+    # Daily SMS digest — 7am ET (12:00 UTC)
     - cron: '0 12 * * *'
 
     # Daily BTC chart — 9am ET (14:00 UTC)
@@ -11,33 +11,80 @@ on:
     # Daily $1M prediction — 11am ET (16:00 UTC)
     - cron: '0 16 * * *'
 
-    # Replies — every 21 minutes (3x/hour at :00, :21, :42)
-    - cron: '*/21 * * * *'
-
     # Night posts
     - cron: '0 2 * * *'    # 9pm ET — retirement calculator
     - cron: '30 3 * * *'   # 10:30pm ET — sentiment prediction
 
-    # X posts — every 98 minutes (15x/day, ~450/month)
-    - cron: '0 0 * * *'    # 00:00
-    - cron: '38 1 * * *'   # 01:38
-    - cron: '16 3 * * *'   # 03:16
-    - cron: '54 4 * * *'   # 04:54
-    - cron: '32 6 * * *'   # 06:32
-    - cron: '10 8 * * *'   # 08:10
-    - cron: '48 9 * * *'   # 09:48
-    - cron: '26 11 * * *'  # 11:26
-    - cron: '4 13 * * *'   # 13:04
-    - cron: '42 14 * * *'  # 14:42
-    - cron: '20 16 * * *'  # 16:20
-    - cron: '58 17 * * *'  # 17:58
-    - cron: '36 19 * * *'  # 19:36
-    - cron: '14 21 * * *'  # 21:14
-    - cron: '52 22 * * *'  # 22:52
+    # X posts — every 98 minutes (15x/day)
+    - cron: '0 0 * * *'
+    - cron: '38 1 * * *'
+    - cron: '16 3 * * *'
+    - cron: '54 4 * * *'
+    - cron: '32 6 * * *'
+    - cron: '10 8 * * *'
+    - cron: '48 9 * * *'
+    - cron: '26 11 * * *'
+    - cron: '4 13 * * *'
+    - cron: '42 14 * * *'
+    - cron: '20 16 * * *'
+    - cron: '58 17 * * *'
+    - cron: '36 19 * * *'
+    - cron: '14 21 * * *'
+    - cron: '52 22 * * *'
 
-  workflow_dispatch:         # manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
+  digest:
+    if: github.event.schedule == '0 12 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python digest_bot.py
+        env:
+          ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
+          EMAIL_FROM:           ${{ secrets.EMAIL_FROM }}
+          EMAIL_APP_PASSWORD:   ${{ secrets.EMAIL_APP_PASSWORD }}
+          PHONE_NUMBER:         ${{ secrets.PHONE_NUMBER }}
+
+  chart:
+    if: github.event.schedule == '0 14 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python chart_bot.py
+        env:
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          X_API_KEY:              ${{ secrets.X_API_KEY }}
+          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+
+  prediction:
+    if: github.event.schedule == '0 16 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python prediction_bot.py
+        env:
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          X_API_KEY:              ${{ secrets.X_API_KEY }}
+          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+
   night-retirement:
     if: github.event.schedule == '0 2 * * *' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -72,75 +119,10 @@ jobs:
           X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
 
-  prediction:
-    if: github.event.schedule == '0 16 * * *' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: python prediction_bot.py
-        env:
-          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
-          X_API_KEY:              ${{ secrets.X_API_KEY }}
-          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
-          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
-          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-
-  reply:
-    if: github.event.schedule == '*/21 * * * *' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: python reply_bot.py
-        env:
-          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
-          X_API_KEY:              ${{ secrets.X_API_KEY }}
-          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
-          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
-          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-
-  chart:
-    if: github.event.schedule == '0 14 * * *' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: python chart_bot.py
-        env:
-          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
-          X_API_KEY:              ${{ secrets.X_API_KEY }}
-          X_API_SECRET:           ${{ secrets.X_API_SECRET }}
-          X_ACCESS_TOKEN:         ${{ secrets.X_ACCESS_TOKEN }}
-          X_ACCESS_TOKEN_SECRET:  ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-
-  digest:
-    if: github.event.schedule == '0 12 * * *' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: python digest_bot.py
-        env:
-          ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
-          EMAIL_FROM:           ${{ secrets.EMAIL_FROM }}
-          EMAIL_APP_PASSWORD:   ${{ secrets.EMAIL_APP_PASSWORD }}
-          PHONE_NUMBER:         ${{ secrets.PHONE_NUMBER }}
-
   post:
-    if: github.event.schedule != '0 12 * * *' || github.event_name == 'workflow_dispatch'
+    if: >
+      contains(fromJSON('["0 0 * * *","38 1 * * *","16 3 * * *","54 4 * * *","32 6 * * *","10 8 * * *","48 9 * * *","26 11 * * *","4 13 * * *","42 14 * * *","20 16 * * *","58 17 * * *","36 19 * * *","14 21 * * *","52 22 * * *"]'), github.event.schedule) ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
